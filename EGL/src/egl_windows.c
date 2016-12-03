@@ -198,15 +198,12 @@ EGLBoolean __processAttribList(EGLint* target_attrib_list, const EGLint* attrib_
 		return EGL_FALSE;
 	}
 
-	EGLint template_attrib_list[] = {
-			WGL_CONTEXT_MAJOR_VERSION_ARB, 1,
-			WGL_CONTEXT_MINOR_VERSION_ARB, 0,
-			WGL_CONTEXT_LAYER_PLANE_ARB, 0,
-			WGL_CONTEXT_FLAGS_ARB, 0,
-			WGL_CONTEXT_PROFILE_MASK_ARB, 0,
-			WGL_CONTEXT_RESET_NOTIFICATION_STRATEGY_ARB, WGL_NO_RESET_NOTIFICATION_ARB,
-			0
-	};
+	EGLint _WGL_CONTEXT_MAJOR_VERSION_ARB = 0;
+	EGLint _WGL_CONTEXT_MINOR_VERSION_ARB = 0;
+	EGLint _WGL_CONTEXT_LAYER_PLANE_ARB = 0;
+	EGLint _WGL_CONTEXT_FLAGS_ARB = 0;
+	EGLint _WGL_CONTEXT_PROFILE_MASK_ARB = 0;
+	EGLint _WGL_CONTEXT_RESET_NOTIFICATION_STRATEGY_ARB = 0;
 
 	EGLint attribListIndex = 0;
 
@@ -225,7 +222,7 @@ EGLBoolean __processAttribList(EGLint* target_attrib_list, const EGLint* attrib_
 				return EGL_FALSE;
 			}
 
-			template_attrib_list[1] = value;
+			_WGL_CONTEXT_MAJOR_VERSION_ARB = value;
 		}
 		break;
 		case EGL_CONTEXT_MINOR_VERSION:
@@ -237,18 +234,18 @@ EGLBoolean __processAttribList(EGLint* target_attrib_list, const EGLint* attrib_
 				return EGL_FALSE;
 			}
 
-			template_attrib_list[3] = value;
+			_WGL_CONTEXT_MINOR_VERSION_ARB = value;
 		}
 		break;
 		case EGL_CONTEXT_OPENGL_PROFILE_MASK:
 		{
 			if (value == EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT)
 			{
-				template_attrib_list[9] = WGL_CONTEXT_CORE_PROFILE_BIT_ARB;
+				_WGL_CONTEXT_PROFILE_MASK_ARB = WGL_CONTEXT_CORE_PROFILE_BIT_ARB;
 			}
 			else if (value == EGL_CONTEXT_OPENGL_COMPATIBILITY_PROFILE_BIT)
 			{
-				template_attrib_list[9] = WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB;
+				_WGL_CONTEXT_PROFILE_MASK_ARB = WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB;
 			}
 			else
 			{
@@ -262,11 +259,11 @@ EGLBoolean __processAttribList(EGLint* target_attrib_list, const EGLint* attrib_
 		{
 			if (value == EGL_TRUE)
 			{
-				template_attrib_list[7] |= WGL_CONTEXT_DEBUG_BIT_ARB;
+				_WGL_CONTEXT_FLAGS_ARB |= WGL_CONTEXT_DEBUG_BIT_ARB;
 			}
 			else if (value == EGL_FALSE)
 			{
-				template_attrib_list[7] &= ~WGL_CONTEXT_DEBUG_BIT_ARB;
+				_WGL_CONTEXT_FLAGS_ARB &= ~WGL_CONTEXT_DEBUG_BIT_ARB;
 			}
 			else
 			{
@@ -280,11 +277,11 @@ EGLBoolean __processAttribList(EGLint* target_attrib_list, const EGLint* attrib_
 		{
 			if (value == EGL_TRUE)
 			{
-				template_attrib_list[7] |= WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB;
+				_WGL_CONTEXT_FLAGS_ARB |= WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB;
 			}
 			else if (value == EGL_FALSE)
 			{
-				template_attrib_list[7] &= ~WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB;
+				_WGL_CONTEXT_FLAGS_ARB &= ~WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB;
 			}
 			else
 			{
@@ -298,11 +295,11 @@ EGLBoolean __processAttribList(EGLint* target_attrib_list, const EGLint* attrib_
 		{
 			if (value == EGL_TRUE)
 			{
-				template_attrib_list[7] |= WGL_CONTEXT_ROBUST_ACCESS_BIT_ARB;
+				_WGL_CONTEXT_FLAGS_ARB |= WGL_CONTEXT_ROBUST_ACCESS_BIT_ARB;
 			}
 			else if (value == EGL_FALSE)
 			{
-				template_attrib_list[7] &= ~WGL_CONTEXT_ROBUST_ACCESS_BIT_ARB;
+				_WGL_CONTEXT_FLAGS_ARB &= ~WGL_CONTEXT_ROBUST_ACCESS_BIT_ARB;
 			}
 			else
 			{
@@ -316,11 +313,11 @@ EGLBoolean __processAttribList(EGLint* target_attrib_list, const EGLint* attrib_
 		{
 			if (value == EGL_NO_RESET_NOTIFICATION)
 			{
-				template_attrib_list[11] = WGL_NO_RESET_NOTIFICATION_ARB;
+				_WGL_CONTEXT_RESET_NOTIFICATION_STRATEGY_ARB = WGL_NO_RESET_NOTIFICATION_ARB;
 			}
 			else if (value == EGL_LOSE_CONTEXT_ON_RESET)
 			{
-				template_attrib_list[11] = WGL_LOSE_CONTEXT_ON_RESET_ARB;
+				_WGL_CONTEXT_RESET_NOTIFICATION_STRATEGY_ARB = WGL_LOSE_CONTEXT_ON_RESET_ARB;
 			}
 			else
 			{
@@ -350,6 +347,34 @@ EGLBoolean __processAttribList(EGLint* target_attrib_list, const EGLint* attrib_
 		}
 	}
 
+	EGLint curr_attrib_list[] = 
+	{
+		WGL_CONTEXT_MAJOR_VERSION_ARB, _WGL_CONTEXT_MAJOR_VERSION_ARB,
+		WGL_CONTEXT_MINOR_VERSION_ARB, _WGL_CONTEXT_MINOR_VERSION_ARB,
+		WGL_CONTEXT_LAYER_PLANE_ARB, _WGL_CONTEXT_LAYER_PLANE_ARB,
+		WGL_CONTEXT_FLAGS_ARB, _WGL_CONTEXT_FLAGS_ARB,
+		WGL_CONTEXT_PROFILE_MASK_ARB, _WGL_CONTEXT_PROFILE_MASK_ARB,
+		WGL_CONTEXT_RESET_NOTIFICATION_STRATEGY_ARB, _WGL_CONTEXT_RESET_NOTIFICATION_STRATEGY_ARB,
+		0
+	};
+
+	EGLint template_attrib_list[20];
+	EGLint * curr_template_attrib_list = template_attrib_list;
+
+	for (int i = 0; i < 6; ++i)
+	{
+		const int num = i * 2;
+		if (curr_attrib_list[num + 1])
+		{
+			*curr_template_attrib_list = curr_attrib_list[num];
+			++curr_template_attrib_list;
+			*curr_template_attrib_list = curr_attrib_list[num + 1];
+			++curr_template_attrib_list;
+		}
+	}
+
+	*curr_template_attrib_list = 0;
+		
 	memcpy(target_attrib_list, template_attrib_list, CONTEXT_ATTRIB_LIST_SIZE * sizeof(EGLint));
 
 	return EGL_TRUE;
